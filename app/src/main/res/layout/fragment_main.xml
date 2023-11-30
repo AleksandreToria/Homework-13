@@ -3,8 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginHorizontal="30dp"
+    android:background="@drawable/background"
     android:orientation="vertical"
+    android:paddingHorizontal="20dp"
     tools:context=".MainFragment">
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -18,8 +19,8 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="550dp"
-        android:layout_marginTop="20dp" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/regBtn"
@@ -27,7 +28,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end"
         android:layout_marginTop="20dp"
-        android:text="@string/register" />
+        android:background="@drawable/rounded_button"
+        android:paddingHorizontal="20dp"
+        android:text="@string/register"
+        android:textColor="@color/white" />
 
 
 </androidx.appcompat.widget.LinearLayoutCompat>

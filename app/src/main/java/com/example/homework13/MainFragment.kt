@@ -2,23 +2,21 @@ package com.example.homework13
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.homework13.databinding.FragmentMainBinding
 
 
 class MainFragment : BaseFragment<FragmentMainBinding>(FragmentMainBinding::inflate) {
+
     private lateinit var adapter: Adapter
+    private val mainViewModel: MainViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         adapter = Adapter()
-
-        val jsonParser = JsonParser(requireContext())
-        val formData = jsonParser.parseFormData("Information.json")
-
-        val firstList = formData?.flatten() ?: emptyList()
-        adapter.setData(firstList)
 
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.adapter = adapter
@@ -28,11 +26,23 @@ class MainFragment : BaseFragment<FragmentMainBinding>(FragmentMainBinding::infl
 
             val action =
                 MainFragmentDirections.actionMainFragmentToInfoFragment(userDataList.toTypedArray())
-
             findNavController().navigate(action)
         }
+
+        mainViewModel.formData.observe(viewLifecycleOwner) { formDataList ->
+            adapter.submitList(formDataList)
+
+            adapter.setCurrentUserData(formDataList.flatten())
+        }
+
+        mainViewModel.loadJsonData(requireContext(), "Information.json")
     }
 }
+
+
+
+
+
 
 
 

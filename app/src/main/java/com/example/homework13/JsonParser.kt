@@ -8,7 +8,12 @@ import java.io.InputStream
 
 class JsonParser(private val context: Context) {
 
-    fun parseFormData(fileName: String): List<List<FormField>>? {
+    data class ParsedFormData(
+        val formData: List<List<FormField>>?,
+        val numberOfArrays: Int
+    )
+
+    fun parseFormData(fileName: String): ParsedFormData {
         return try {
             val inputStream: InputStream = context.assets.open(fileName)
             val size: Int = inputStream.available()
@@ -19,11 +24,14 @@ class JsonParser(private val context: Context) {
             val json = String(buffer, Charsets.UTF_8)
 
             val listType = object : TypeToken<List<List<FormField>>>() {}.type
-            Gson().fromJson(json, listType)
+            val formData = Gson().fromJson<List<List<FormField>>>(json, listType)
+
+            ParsedFormData(formData, formData?.size ?: 0)
 
         } catch (e: IOException) {
             e.printStackTrace()
-            null
+            ParsedFormData(null, 0)
         }
     }
 }
+

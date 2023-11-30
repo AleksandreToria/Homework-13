@@ -1,88 +1,121 @@
 package com.example.homework13
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Context
+import android.text.Editable
 import android.text.InputType
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.EditText
-import androidx.appcompat.app.AlertDialog
-import androidx.core.widget.addTextChangedListener
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.homework13.databinding.FieldLayoutBinding
+import com.example.homework13.databinding.CardLayoutBinding
 import java.util.Calendar
 
 class Adapter :
-    ListAdapter<FormField, RecyclerView.ViewHolder>(object : DiffUtil.ItemCallback<FormField>() {
-        override fun areItemsTheSame(oldItem: FormField, newItem: FormField): Boolean {
-            return oldItem.field_id == newItem.field_id
-        }
+    ListAdapter<List<FormField>, RecyclerView.ViewHolder>(DiffCallBack()) {
 
-        override fun areContentsTheSame(oldItem: FormField, newItem: FormField): Boolean {
+    class DiffCallBack : DiffUtil.ItemCallback<List<FormField>>() {
+        override fun areItemsTheSame(oldItem: List<FormField>, newItem: List<FormField>): Boolean {
             return oldItem == newItem
         }
-    }) {
 
-    private var userData: List<FormField> = emptyList()
+        override fun areContentsTheSame(
+            oldItem: List<FormField>,
+            newItem: List<FormField>
+        ): Boolean {
+            return oldItem == newItem
+        }
 
-    fun setData(fields: List<FormField>) {
-        submitList(fields)
-        userData = fields
     }
 
-    fun getCurrentUserData(): List<FormField> {
-        return userData
+    private var formDataList: MutableList<FormField> = mutableListOf()
+
+
+    fun setCurrentUserData(userDataList: List<FormField>) {
+        formDataList.clear()
+        formDataList.addAll(userDataList)
     }
 
-    inner class ViewHolder(private val binding: FieldLayoutBinding) :
+    inner class ViewHolder(private val binding: CardLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(field: FormField) {
-            with(binding.et) {
-                hint = field.hint
+        fun bind(userDataList: List<FormField>) {
+            binding.linearLayout.removeAllViews()
+            val context = binding.root.context
+            val parentLayout = binding.linearLayout
 
-                inputType = when (field.hint) {
+            userDataList.forEachIndexed { _, userDataField ->
+                val editText = AppCompatEditText(context)
+                editText.hint = userDataField.hint
+
+                editText.setText(userDataField.enteredValue)
+
+                editText.inputType = when (userDataField.hint) {
                     "Email" -> InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
                     "phone" -> InputType.TYPE_CLASS_PHONE
                     "FullName" -> InputType.TYPE_TEXT_VARIATION_PERSON_NAME
+                    "Birthday" -> InputType.TYPE_NULL
+                    "Gender" -> InputType.TYPE_NULL
                     else -> InputType.TYPE_CLASS_TEXT
                 }
 
-                setText(field.enteredValue)
+                editText.setOnFocusChangeListener { _, hasFocus ->
+                    if (hasFocus) {
+                        if (editText.hint == "Birthday") {
+                            showDatePicker(context, editText, userDataField)
+                        }
 
-                setOnClickListener {
-                    if (field.hint == "Birthday" || field.hint == "Gender") {
-                        inputType = InputType.TYPE_NULL
-                        isFocusable = false
-                    }
-
-                    if (field.hint == "Birthday") {
-                        showDatePicker(context, this, field)
-                    }
-
-                    if (field.hint == "Gender") {
-                        showGenderPicker(context, this, field)
+                        if (editText.hint == "Gender") {
+                            showGenderPicker(context, editText, userDataField)
+                        }
                     }
                 }
 
-                addTextChangedListener { editable ->
-                    field.enteredValue = editable.toString()
-                }
+                editText.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        count: Int,
+                        after: Int
+                    ) {
+                    }
+
+                    override fun onTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        before: Int,
+                        count: Int
+                    ) {
+                        userDataField.enteredValue = s.toString()
+                    }
+
+                    override fun afterTextChanged(s: Editable?) {}
+                })
+
+                parentLayout.addView(editText)
             }
         }
+
+    }
+
+    fun getCurrentUserData(): List<FormField> {
+        return formDataList
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return ViewHolder(
-            FieldLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        )
+        val binding = CardLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is ViewHolder) {
-            holder.bind(getItem(position))
+        val model = getItem(position)
+        when (holder) {
+            is ViewHolder -> holder.bind(model)
         }
     }
 
@@ -119,5 +152,9 @@ class Adapter :
         dialog.show()
     }
 }
+
+
+
+
 
 
