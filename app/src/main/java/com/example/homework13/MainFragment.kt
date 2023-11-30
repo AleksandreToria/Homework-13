@@ -8,14 +8,10 @@ import com.example.homework13.databinding.FragmentMainBinding
 
 
 class MainFragment : BaseFragment<FragmentMainBinding>(FragmentMainBinding::inflate) {
-
-    private lateinit var binding: FragmentMainBinding
     private lateinit var adapter: Adapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        binding = FragmentMainBinding.bind(view)
         adapter = Adapter()
 
         val jsonParser = JsonParser(requireContext())

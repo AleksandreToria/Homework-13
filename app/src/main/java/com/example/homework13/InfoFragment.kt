@@ -9,12 +9,9 @@ import com.example.homework13.databinding.FragmentInfoBinding
 
 class InfoFragment : BaseFragment<FragmentInfoBinding>(FragmentInfoBinding::inflate) {
     private lateinit var userData: Array<FormField>
-    private lateinit var binding: FragmentInfoBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        binding = FragmentInfoBinding.bind(view)
 
         userData =
             requireArguments().getParcelableArray("moveData") as? Array<FormField> ?: emptyArray()
